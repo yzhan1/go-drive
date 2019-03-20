@@ -8,16 +8,20 @@ type FileMetadata struct {
 	UploadAt string
 }
 
-var metaDataMap map[string]FileMetadata
+var metadataMap map[string]FileMetadata
 
 func init() {
-	metaDataMap = make(map[string]FileMetadata)
+	metadataMap = make(map[string]FileMetadata)
 }
 
 func UpdateFileMetadata(data FileMetadata) {
-	metaDataMap[data.FileHash] = data
+	metadataMap[data.FileHash] = data
 }
 
 func GetFileMetadata(fileHash string) FileMetadata {
-	return metaDataMap[fileHash]
+	return metadataMap[fileHash]
+}
+
+func DeleteFileMetadata(fileHash string) {
+	delete(metadataMap, fileHash)
 }

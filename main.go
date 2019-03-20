@@ -11,7 +11,10 @@ func main() {
 
 	http.HandleFunc("/files/upload", handler.UploadHandler)
 	http.HandleFunc("/files/upload/success", handler.UploadSuccessHandler)
-	http.HandleFunc("/files/search", handler.FileQueryHandler)
+	http.HandleFunc("/files/search", handler.QueryHandler)
+	http.HandleFunc("/files/download", handler.DownloadHandler)
+	http.HandleFunc("/files/update", handler.UpdateHandler)
+	http.HandleFunc("/files/delete", handler.DeleteHandler)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {

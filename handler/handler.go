@@ -59,7 +59,7 @@ func UploadSuccessHandler(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "Upload Success!")
 }
 
-func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
+func QueryHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	fileHash := r.Form["filehash"][0]
@@ -71,4 +71,69 @@ func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(data)
+}
+
+func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	fileHash := r.Form.Get("filehash")
+	fileMetadata := metadata.GetFileMetadata(fileHash)
+
+	f, err := os.Open(fileMetadata.Location)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/octect-stream")
+	w.Header().Set("Content-Description", "attachment; filename=\""+fileMetadata.FileName+"\"")
+	w.Write(data)
+}
+
+func UpdateHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	op := r.Form.Get("op")
+	fileHash := r.Form.Get("filehash")
+	newName := r.Form.Get("filename")
+
+	if op != "0" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	fileMetadata := metadata.GetFileMetadata(fileHash)
+	fileMetadata.FileName = newName
+	metadata.UpdateFileMetadata(fileMetadata)
+
+	data, err := json.Marshal(fileMetadata)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	fileHash := r.Form.Get("filehash")
+	fileMetadata := metadata.GetFileMetadata(fileHash)
+	defer os.Remove(fileMetadata.Location)
+
+	metadata.DeleteFileMetadata(fileHash)
+
+	w.WriteHeader(http.StatusOK)
 }
