@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"godrive/handler"
+	"github.com/yzhan1/go-drive/handler"
 	"net/http"
 )
 

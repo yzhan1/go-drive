@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"godrive/metadata"
-	"godrive/util"
+	"github.com/yzhan1/go-drive/metadata"
+	"github.com/yzhan1/go-drive/util"
 	"io"
 	"io/ioutil"
 	"net/http"
