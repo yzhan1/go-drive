@@ -1,3 +1,3 @@
 # go-drive
 
-Distributed Google Drive System implemented in Golang.
+Distributed Google Drive System implemented in Go.
