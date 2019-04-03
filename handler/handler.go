@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -70,6 +71,20 @@ func QueryHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Write(data)
+}
+
+func QueryRecentFileHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.Form.Get("limit"))
+	fileMetadataArr := metadata.GetRecentFileMetadata(limit)
+	data, err := json.Marshal(fileMetadataArr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
 

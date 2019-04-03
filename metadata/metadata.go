@@ -1,5 +1,7 @@
 package metadata
 
+import "sort"
+
 type FileMetadata struct {
 	FileHash string
 	FileName string
@@ -24,4 +26,13 @@ func GetFileMetadata(fileHash string) FileMetadata {
 
 func DeleteFileMetadata(fileHash string) {
 	delete(metadataMap, fileHash)
+}
+
+func GetRecentFileMetadata(count int) []FileMetadata {
+	arr := make([]FileMetadata, len(metadataMap))
+	for _, v := range metadataMap {
+		arr = append(arr, v)
+	}
+	sort.Sort(SortByUploadTime(arr))
+	return arr[0: count]
 }
