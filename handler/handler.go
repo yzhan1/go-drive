@@ -31,7 +31,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		fileMetaData := metadata.FileMetadata{
 			FileName: head.Filename,
-			Location: "/tmp/" + head.Filename,
+			Location: "/tmp/godrive-files/" + head.Filename,
 			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 
@@ -50,7 +50,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		localFile.Seek(0, 0)
 		fileMetaData.FileHash = util.FileSha1(localFile)
-		metadata.UpdateFileMetadata(fileMetaData)
+		_ = metadata.UpdateFileMetadataDB(fileMetaData)
 
 		http.Redirect(w, r, "/files/upload/success", http.StatusFound)
 	}
@@ -64,7 +64,11 @@ func QueryHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	fileHash := r.Form["filehash"][0]
-	fileMetadata := metadata.GetFileMetadata(fileHash)
+	fileMetadata, err := metadata.GetFileMetadataDB(fileHash)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	data, err := json.Marshal(fileMetadata)
 	if err != nil {

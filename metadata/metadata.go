@@ -1,6 +1,9 @@
 package metadata
 
-import "sort"
+import (
+	"github.com/yzhan1/go-drive/db"
+	"sort"
+)
 
 type FileMetadata struct {
 	FileHash string
@@ -18,6 +21,24 @@ func init() {
 
 func UpdateFileMetadata(data FileMetadata) {
 	metadataMap[data.FileHash] = data
+}
+
+func UpdateFileMetadataDB(data FileMetadata) bool {
+	return db.OnFileUploadFinished(data.FileHash, data.FileName, data.FileSize, data.Location)
+}
+
+func GetFileMetadataDB(fileHash string) (FileMetadata, error) {
+	file, err := db.GetFileMeta(fileHash)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+	fileMetadata := FileMetadata{
+		FileHash: file.FileHash,
+		FileName: file.FileName.String,
+		FileSize: file.FileSize.Int64,
+		Location: file.FileAddr.String,
+	}
+	return fileMetadata, nil
 }
 
 func GetFileMetadata(fileHash string) FileMetadata {

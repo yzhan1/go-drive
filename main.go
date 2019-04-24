@@ -15,10 +15,10 @@ func main() {
 	http.HandleFunc("/files/update", handler.UpdateHandler)
 	http.HandleFunc("/files/delete", handler.DeleteHandler)
 
+	fmt.Println("Server live on port 8080!")
+
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Printf("Failed to start server: %s", err.Error())
-	} else {
-		fmt.Println("Server live on port 8080!")
 	}
 }
