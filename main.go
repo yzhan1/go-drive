@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 	http.HandleFunc("/files/upload", handler.UploadHandler)
 	http.HandleFunc("/files/upload/success", handler.UploadSuccessHandler)
 	http.HandleFunc("/files/search", handler.QueryHandler)
@@ -14,6 +16,10 @@ func main() {
 	http.HandleFunc("/files/download", handler.DownloadHandler)
 	http.HandleFunc("/files/update", handler.UpdateHandler)
 	http.HandleFunc("/files/delete", handler.DeleteHandler)
+
+	http.HandleFunc("/users/signup", handler.SignUpHandler)
+	http.HandleFunc("/users/signin", handler.SignInHandler)
+	http.HandleFunc("/users/info", handler.UserInfoHandler)
 
 	fmt.Println("Server live on port 8080!")
 

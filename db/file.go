@@ -6,7 +6,7 @@ import (
 	db "github.com/yzhan1/go-drive/db/mysql"
 )
 
-func OnFileUploadFinished(filehash string, filename string, filesize int64, fileaddr string) bool {
+func UpdateFileMetadata(filehash string, filename string, filesize int64, fileaddr string) bool {
 	statement, err := db.GetConn().Prepare("insert ignore into tbl_file (`file_sha1`, `file_name`, `file_size`," +
 		"`file_addr`, `status`) values (?,?,?,?,1)")
 	if err != nil {
@@ -36,7 +36,7 @@ type File struct {
 	FileAddr sql.NullString
 }
 
-func GetFileMeta(filehash string) (*File, error) {
+func GetFileMetadata(filehash string) (*File, error) {
 	statement, err := db.GetConn().Prepare(
 		"select file_sha1,file_addr,file_name,file_size from tbl_file " +
 			"where file_sha1=? and status=1 limit 1")

@@ -24,11 +24,11 @@ func UpdateFileMetadata(data FileMetadata) {
 }
 
 func UpdateFileMetadataDB(data FileMetadata) bool {
-	return db.OnFileUploadFinished(data.FileHash, data.FileName, data.FileSize, data.Location)
+	return db.UpdateFileMetadata(data.FileHash, data.FileName, data.FileSize, data.Location)
 }
 
 func GetFileMetadataDB(fileHash string) (FileMetadata, error) {
-	file, err := db.GetFileMeta(fileHash)
+	file, err := db.GetFileMetadata(fileHash)
 	if err != nil {
 		return FileMetadata{}, err
 	}
