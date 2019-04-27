@@ -20,7 +20,7 @@ func NewResponse(code int, msg string, data interface{}) *Response {
 	}
 }
 
-func (resp *Response) JSONBytesResp() []byte {
+func (resp *Response) ToJSONBytes() []byte {
 	r, err := json.Marshal(resp)
 	if err != nil {
 		log.Println(err)
@@ -28,7 +28,7 @@ func (resp *Response) JSONBytesResp() []byte {
 	return r
 }
 
-func (resp *Response) JSONStringResp() string {
+func (resp *Response) ToJSONString() string {
 	r, err := json.Marshal(resp)
 	if err != nil {
 		log.Println(err)

@@ -19,7 +19,7 @@ func main() {
 
 	http.HandleFunc("/users/signup", handler.SignUpHandler)
 	http.HandleFunc("/users/signin", handler.SignInHandler)
-	http.HandleFunc("/users/info", handler.UserInfoHandler)
+	http.HandleFunc("/users/info", handler.HttpInterceptor(handler.UserInfoHandler))
 
 	fmt.Println("Server live on port 8080!")
 

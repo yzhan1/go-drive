@@ -73,19 +73,13 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 				Token:    token,
 			},
 		}
-		w.Write(resp.JSONBytesResp())
+		w.Write(resp.ToJSONBytes())
 	}
 }
 
 func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.Form.Get("username")
-	token := r.Form.Get("token")
-
-	if !isValidToken(token) {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
 	user, err := db.GetUserInfo(username)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
@@ -95,7 +89,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 			Msg:  "OK",
 			Data: user,
 		}
-		w.Write(resp.JSONBytesResp())
+		w.Write(resp.ToJSONBytes())
 	}
 }
 
@@ -106,5 +100,8 @@ func GenerateToken(username string) string {
 }
 
 func isValidToken(token string) bool {
+	if len(token) != 40 {
+		return false
+	}
 	return false
 }
