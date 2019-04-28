@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"github.com/yzhan1/go-drive/db"
-	"sort"
 )
 
 type FileMetadata struct {
@@ -47,13 +46,4 @@ func GetFileMetadata(fileHash string) FileMetadata {
 
 func DeleteFileMetadata(fileHash string) {
 	delete(metadataMap, fileHash)
-}
-
-func GetRecentFileMetadata(count int) []FileMetadata {
-	arr := make([]FileMetadata, len(metadataMap))
-	for _, v := range metadataMap {
-		arr = append(arr, v)
-	}
-	sort.Sort(SortByUploadTime(arr))
-	return arr[0:count]
 }

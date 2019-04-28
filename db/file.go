@@ -42,7 +42,7 @@ func GetFileMetadata(filehash string) (*File, error) {
 			"where file_sha1=? and status=1 limit 1")
 	if err != nil {
 		fmt.Println("Error preparing statement: " + err.Error())
-		return nil, err
+		return &File{}, err
 	}
 	defer statement.Close()
 
@@ -50,7 +50,7 @@ func GetFileMetadata(filehash string) (*File, error) {
 	err = statement.QueryRow(filehash).Scan(&file.FileHash, &file.FileAddr, &file.FileName, &file.FileSize)
 	if err != nil {
 		fmt.Println("Error querying statement: " + err.Error())
-		return nil, err
+		return &file, err
 	}
 	return &file, nil
 }

@@ -55,7 +55,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
 		username := r.Form.Get("username")
-		success := db.OnUserFileUploadFinished(username, fileMetaData.FileHash, fileMetaData.FileName,
+		success := db.UploadFile(username, fileMetaData.FileHash, fileMetaData.FileName,
 			fileMetaData.FileSize)
 
 		if success {
@@ -171,4 +171,38 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	metadata.DeleteFileMetadata(fileHash)
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func FastUploadHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	username := r.Form.Get("username")
+	filehash := r.Form.Get("filehash")
+	filename := r.Form.Get("filename")
+	filesize, err := strconv.Atoi(r.Form.Get("filesize"))
+
+	fileMetadata, err := metadata.GetFileMetadataDB(filehash)
+	if err != nil {
+		fmt.Println(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if fileMetadata.FileHash == "" {
+		resp := util.Response{
+			Code: -1,
+			Msg:  "Failed to use fast upload. Please re-upload",
+		}
+		w.Write(resp.ToJSONBytes())
+	} else {
+		success := db.UploadFile(username, filehash, filename, int64(filesize))
+		resp := util.Response{}
+		if success {
+			resp.Code = 0
+			resp.Msg = "Success"
+		} else {
+			resp.Code = -1
+			resp.Msg = "Failed"
+		}
+		w.Write(resp.ToJSONBytes())
+	}
 }

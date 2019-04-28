@@ -15,7 +15,7 @@ type UserFile struct {
 	LastUpdate string
 }
 
-func OnUserFileUploadFinished(username, filehash, filename string, filesize int64) bool {
+func UploadFile(username, filehash, filename string, filesize int64) bool {
 	statement, err := db.GetConn().Prepare(
 		"insert ignore into tbl_user_file (`user_name`, `file_sha1`, `file_name`, `file_size`, `upload_at`)" +
 			" values (?, ?, ?, ?, ?)")
