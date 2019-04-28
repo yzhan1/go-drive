@@ -55,5 +55,5 @@ func GetRecentFileMetadata(count int) []FileMetadata {
 		arr = append(arr, v)
 	}
 	sort.Sort(SortByUploadTime(arr))
-	return arr[0: count]
+	return arr[0:count]
 }

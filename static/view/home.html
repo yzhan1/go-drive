@@ -68,7 +68,7 @@
   window.onload = function () {
     var username = document.getElementById('username');
     $.ajax({
-      url: "/user/info?" + queryParams(),
+      url: "/users/info?" + queryParams(),
       type: "POST",
       error: function (jqXHR, textStatus, errorThrown) {
         if (textStatus == "error") {
@@ -88,7 +88,7 @@
 
   function updateFileList() {
     $.ajax({
-      url: "/file/query?" + queryParams(),
+      url: "/files/query?" + queryParams(),
       type: "POST",
       data: {
         limit: 10
@@ -129,7 +129,7 @@
           cell = x.insertCell();
           cell.innerHTML = '<button class="btn btn-success" ' +
             'style="height:30px;margin:5px 0;"' +
-            'onClick = "downloadFile(\'http://localhost:8080/file/' +
+            'onClick = "downloadFile(\'http://localhost:8080/files/' +
             'downloadurl?filehash=' + data[i].FileHash + '&' + queryParams() + '\')">下载</button>';
         }
       }
@@ -137,7 +137,7 @@
   }
 
   function toUploadFile() {
-    window.location.href = '/file/upload?' + queryParams();
+    window.location.href = '/files/upload?' + queryParams();
   }
 
   function downloadFile(durl) {

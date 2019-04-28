@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/yzhan1/go-drive/db"
 	"github.com/yzhan1/go-drive/metadata"
 	"github.com/yzhan1/go-drive/util"
 	"io"
@@ -31,20 +32,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		fileMetaData := metadata.FileMetadata{
 			FileName: head.Filename,
-			Location: "/tmp/godrive-files/" + head.Filename,
+			Location: "/tmp/" + head.Filename,
 			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
 		}
 
 		localFile, err := os.Create(fileMetaData.Location)
 		if err != nil {
-			fmt.Printf("Failed to create file: %s", err.Error())
+			fmt.Printf("Failed to create file: %s\n", err.Error())
 			return
 		}
 		defer localFile.Close()
 
 		fileMetaData.FileSize, err = io.Copy(localFile, file)
 		if err != nil {
-			fmt.Printf("Failed to save data into file: %s", err.Error())
+			fmt.Printf("Failed to save data into file: %s\n", err.Error())
 			return
 		}
 
@@ -52,7 +53,16 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fileMetaData.FileHash = util.FileSha1(localFile)
 		_ = metadata.UpdateFileMetadataDB(fileMetaData)
 
-		http.Redirect(w, r, "/files/upload/success", http.StatusFound)
+		r.ParseForm()
+		username := r.Form.Get("username")
+		success := db.OnUserFileUploadFinished(username, fileMetaData.FileHash, fileMetaData.FileName,
+			fileMetaData.FileSize)
+
+		if success {
+			http.Redirect(w, r, "/static/view/home.html", http.StatusFound)
+		} else {
+			w.Write([]byte("Update Failed"))
+		}
 	}
 }
 
@@ -80,16 +90,22 @@ func QueryHandler(w http.ResponseWriter, r *http.Request) {
 
 func QueryRecentFileHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-
 	limit, _ := strconv.Atoi(r.Form.Get("limit"))
-	fileMetadataArr := metadata.GetRecentFileMetadata(limit)
-	data, err := json.Marshal(fileMetadataArr)
+	username := r.Form.Get("username")
+
+	files, err := db.QueryUserFileMetadata(username, limit)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+
+	data, err := json.Marshal(files)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
+	}
 }
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {

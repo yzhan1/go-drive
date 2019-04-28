@@ -103,5 +103,5 @@ func isValidToken(token string) bool {
 	if len(token) != 40 {
 		return false
 	}
-	return false
+	return true
 }
